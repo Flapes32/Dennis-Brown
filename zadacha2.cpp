@@ -1,42 +1,67 @@
-#include<Windows.h>
-#include<processthreadsapi.h>
-#include<stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <pthread.h>
+#include <signal.h>
+#include <string.h>
 
+void* InputHandler()
+{
+    char a[256];
 
-BOOL WINAPI CtrlHandler(_In_ DWORD dwCtrlType) {
-    if (dwCtrlType == CTRL_C_EVENT) {
-        printf("Ctrl-C event\n");
-        exit(1);
-    }
-    else if (dwCtrlType == CTRL_CLOSE_EVENT) {
-        printf("CTRL-CLOSE event\n");
-        exit(2);
-    }
-    else {
-        return FALSE;
-    }
-}
-
-void printRandomNumber() {
-    while (TRUE) {
-        printf("%f\n", (double)rand() / RAND_MAX);
-        Sleep(1500);
-    }
-}
-
-void reversString() {
-    while (TRUE) {
-
-        char str[250];
-        scanf_s("%s", str, 250);
-        printf("%s\n", _strrev(str));
+    while (1)
+    {
+        if (fgets(a, sizeof(a), stdin) != NULL)
+        {
+            int b = strlen(a);
+            for (int i = b - 2; i >= 0; i--)
+            {
+                putchar(a[i]);
+            }
+            putchar('\n');
+        }
     }
 }
 
-int main() {
-    SetConsoleCtrlHandler(CtrlHandler, TRUE);
-    CreateThread(NULL, 0, printRandomNumber, NULL, 0, NULL);
-    CreateThread(NULL, 0, reversString, NULL, 0, NULL);
-    while(TRUE){}
+void* RandNum() 
+{
+
+    while (1) 
+    {
+        double random = (double)rand() / RAND_MAX;
+        printf("%.2f\n", random);
+        sleep(3);
+    }
+
+}
+
+void SignalHandler() 
+{
+    printf("Received Signal.\n");
+    exit(1);
+}
+
+int main() 
+{
+    signal(SIGINT, SignalHandler);
+
+    pthread_t RandNumThread, InputThread;
+
+    if (pthread_create(&RandNumThread, NULL, RandNum, NULL) != 0)
+    {
+        perror("!Fail!");
+        return 1;
+    }
+
+    if (pthread_create(&InputThread, NULL, InputHandler, NULL) != 0)
+    {
+        perror("!Fail!");
+        return 1;
+    }
+
+    pthread_join(RandNumThread, NULL);
+
+    pthread_join(InputThread, NULL);
+
     return 0;
 }
