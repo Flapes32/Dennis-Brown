@@ -27,7 +27,7 @@ void changeBalance(const std::vector<double>& changes) {
                 operationCompleted = true;
 
                 std::stringstream notification;
-                notification << "было=" << prevBalance << ", операция " << (change >= 0 ? "+" : "-") << std::abs(change) << ", стало=" << newBalance;
+                std::cout << "было=" << prevBalance << ", операция " << (change >= 0 ? "+" : "-") << std::abs(change) << ", стало=" << newBalance;
                 std::this_thread::sleep_for(std::chrono::milliseconds(50));  // Дополнительная задержка для вывода уведомления
                 std::cout << notification.str() << std::endl;
             }
@@ -62,10 +62,10 @@ int main(int argc, char* argv[]) {
         }
     }
     else {
-        scenario1 = { -120.0, 10.0, 15.0 };
+        scenario1 = { -90.0, 20.0, 25.0 };
     }
 
-    std::vector<double> scenario2 = { -40.0, -30.0, 90.0 };
+    std::vector<double> scenario2 = { -50.0, -40.0, 100.0 };
 
     std::thread thread1(changeBalance, scenario1);
     std::thread thread2(changeBalance, scenario2);
